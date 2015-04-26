@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Настройки</string>
+    <string name="speech_prompt">Кажете нещо&#8230;</string>
+    <string name="speech_not_supported">Съжаляваме, но Вашето устройство не поддържа звуково разпознаване.</string>
+    <string name="tap_on_mic">Натиснете мискрофона за запис</string>
+</resources>

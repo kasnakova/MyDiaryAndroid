@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusable="true" android:focusableInTouchMode="true"
+    android:background="@drawable/background_diary_left_page">
+     
+    <EditText
+        android:id="@+id/txtSpeechInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"
+        android:layout_toLeftOf="@+id/buttonClear"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:textSize="26dp"
+        android:textStyle="normal" >
+
+        <requestFocus />
+    </EditText>
+ 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:gravity="center"
+        android:orientation="vertical" android:id="@+id/linearLayout1">
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSpeak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearLayout1"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:text="@string/button_speak" />
+
+    <Button
+        android:id="@+id/buttonSaveToDb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearLayout1"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_save" />
+
+    <Button
+        android:id="@+id/buttonClear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtSpeechInput"
+        android:layout_alignBottom="@+id/txtSpeechInput"
+        android:layout_alignParentRight="true"
+        android:text="@string/button_clear" />
+ 
+</RelativeLayout>

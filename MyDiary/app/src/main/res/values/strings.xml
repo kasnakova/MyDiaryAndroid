@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">My Diary</string>
+    <string name="pref_locale">PrefLocale</string>
+    <string name="action_logout">Log out</string>
+    <string name="button_save"> Save </string>
+    <string name="button_speak"> Speak </string>
+    <string name="button_clear"> Clear </string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="tap_on_mic">Tap on mic to speak</string>
+    <string name="error_saving_to_db">Sorry but your note was not saved because: </string>
+    <string name="success_saving_to_db">Your note was successfully saved!</string>
+    <string name="error_retrieving_from_db">Sorry but you can\'t see your notes right now</string>
+    <string name="title_activity_login_activty">Login</string>
+    <string name="email_text">E-mail</string>
+    <string name="password_text">Password</string>
+    <string name="login_button_text">Login</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    
+</resources>
