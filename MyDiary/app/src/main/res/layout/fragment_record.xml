@@ -10,51 +10,45 @@
         android:id="@+id/txtSpeechInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="100dp"
-        android:layout_toLeftOf="@+id/buttonClear"
         android:ems="10"
         android:inputType="textMultiLine"
         android:textSize="26dp"
-        android:textStyle="normal" >
+        android:lines="6"
+        android:textStyle="normal"
+        android:layout_below="@+id/btnSpeak"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="47dp">
 
         <requestFocus />
     </EditText>
- 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp"
-        android:gravity="center"
-        android:orientation="vertical" android:id="@+id/linearLayout1">
-    </LinearLayout>
 
     <Button
         android:id="@+id/btnSpeak"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/linearLayout1"
-        android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
-        android:text="@string/button_speak" />
+        android:text="@string/button_speak"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/buttonSaveToDb"
+        android:layout_marginEnd="77dp" />
 
     <Button
         android:id="@+id/buttonSaveToDb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/linearLayout1"
-        android:layout_centerHorizontal="true"
-        android:text="@string/button_save" />
+        android:text="@string/button_save"
+        android:layout_above="@+id/txtSpeechInput"
+        android:layout_alignEnd="@+id/buttonClear" />
 
     <Button
         android:id="@+id/buttonClear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/txtSpeechInput"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/clear"
+        android:src="@drawable/clear"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:layout_alignBottom="@+id/txtSpeechInput"
-        android:layout_alignParentRight="true"
-        android:text="@string/button_clear" />
- 
+        android:layout_alignEnd="@+id/txtSpeechInput" />
+
 </RelativeLayout>

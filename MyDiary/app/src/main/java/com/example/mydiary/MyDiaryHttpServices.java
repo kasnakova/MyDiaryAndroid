@@ -5,6 +5,8 @@ package com.example.mydiary;
  */
 public enum MyDiaryHttpServices {
     Login,
+    Logout,
     Register,
-    Name
+    Name,
+    SaveNote
 }

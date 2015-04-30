@@ -30,6 +30,7 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
 
             connection.setRequestMethod(requestMethod);
             connection.setRequestProperty("User-Agent", USER_AGENT);
+            connection.setConnectTimeout(10000);
 
             if(params.length > 3){
                 connection.setRequestProperty("Authorization", "Bearer " + params[3]);
@@ -88,7 +89,7 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
             try {
                 int responseCode = connection.getResponseCode();
                 if(responseCode == 401){
-                    return "{'success':'false','url':'" + url + "','data':''}";
+                    return "{'success':'false','url':'" + url + "','data':'" + e.getMessage() + "'}";
                 }
             }catch (Exception ex){
                 Log.d(TAG, "Exception in the inner try catch: " + e.toString());

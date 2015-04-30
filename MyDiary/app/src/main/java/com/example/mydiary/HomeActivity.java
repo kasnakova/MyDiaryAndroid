@@ -4,12 +4,14 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,19 +21,17 @@ import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
-public class HomeActivity extends FragmentActivity implements ActionBar.TabListener, OnMenuItemClickListener, IAsyncResponse {
+public class HomeActivity extends FragmentActivity implements ActionBar.TabListener, OnMenuItemClickListener, IMyDiaryHttpResponse {
+    private final int REQ_CODE_LOGIN = 200;
+    private final String TAG = "HomeActivity";
+
+    private IMyDiaryHttpResponse context = this;
+    private MyDiaryHttpRequester myDiaryHttpRequester;
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
-    private final int REQ_CODE_LOGIN = 200;
-    private IAsyncResponse context = this;
-
-    final String TAG = "HomeActivity";
-
-    @Override
-    public void processFinish(String data) {
-        Log.d("HomeActivity", "Data: " + data);
-    }
+    private TextView name;
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,46 +40,9 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
         //Remove focus on EditText when activity starts
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-      //  MyDiaryHttpRequester myDiaryHttpRequester = new MyDiaryHttpRequester(context);
-      //  myDiaryHttpRequester.Register("pesho@abv.bg", "petrov", "Petar");
-        //Login logic
-        //   ParseUser currentUser = ParseUser.getCurrentUser();
-//	        if(currentUser == null) {
-	        	login();
-//	        }
-
-
-
-
-//        try {
-//            final String urlParameters = "Email=" + "kjslk@anc.vd" +
-//                    "&Password=" + "ksjdsl" +
-//                    "&ConfirmPassword=" + "ksjdsl" +
-//                    "&Name=" + "Liza";
-//            Log.d(TAG, "Someone here?");
-//
-//          //  Runnable r = new Runnable() {
-//              //  @Override
-//             //   public void run() {
-////                    Log.d(TAG, "in the runnable");
-////                    new HttpRequester(context)
-////                            .execute(
-////                                    "http://192.168.0.147:50264/Token",
-////                                    "POST",
-////                                    "grant_type=password&username=shasha@abv.bg&password=abracadabra");
-//                    //"Email=shasha@abv.bg&Password=abracadabra&ConfirmPassword=abracadabra&Name=Maria");
-//           //     }
-//        //    };
-//            Log.d(TAG, "oskpa her?");
-//        } catch(Exception ex) {
-//            Log.d(TAG, "Exception: " + ex.toString() + " | Message: " + ex.getMessage());
-//        }
-
-
-
-
 
         // Initilization
+        myDiaryHttpRequester = new MyDiaryHttpRequester(context);
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
@@ -102,31 +65,21 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+
+
+        checkIfLogged();
     }
 
-    public void register(String email, String password, String name) {
-        try {
-            final String urlParameters = "Email=" + email +
-                    "&Password=" + password +
-                    "&ConfirmPassword=" + password +
-                    "&Name=" + name;
-            Log.d(TAG, "Someone here?");
+    public void checkIfLogged(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String accessToken = sharedPreferences.getString("token", "");
 
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "in the runnable");
-                    new HttpRequester(context)
-                            .execute(
-                                    "http://192.168.0.147:50264/Token",
-                                    "POST",
-                                    "grant_type=password&username=shasha@abv.bg&password=abracadabra");
-                    //"Email=shasha@abv.bg&Password=abracadabra&ConfirmPassword=abracadabra&Name=Maria");
-                }
-            };
-            Log.d(TAG, "oskpa her?");
-        } catch(Exception ex) {
-            Log.d(TAG, "Exception: " + ex.toString() + " | Message: " + ex.getMessage());
+        if(accessToken.equals("")){
+            login();
+        } else {
+            progress = ProgressDialog.show(this, null, null, true);
+            MyDiaryUser.setToken(accessToken);
+            myDiaryHttpRequester.getName();
         }
     }
 
@@ -164,14 +117,11 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     private void setUpPopupMenu(Menu menu){
-        //ParseUser currentUser = ParseUser.getCurrentUser();
-        //  if(currentUser != null){
-        TextView tv = new TextView(this);
-        // tv.setText(currentUser.getString("name"));
-        tv.setText("Liza");
-        tv.setPadding(5, 0, 5, 0);
-        tv.setTextSize(20);
-        tv.setOnClickListener(new OnClickListener() {
+        this.name = new TextView(this);
+        this.name.setText(MyDiaryUser.getName());
+        this.name.setPadding(5, 0, 5, 0);
+        this.name.setTextSize(20);
+        this.name.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -182,7 +132,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
             }
         });
-        menu.add(0, 0, 1, "Title").setActionView(tv).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, 0, 1, "Title").setActionView(this.name).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         //  }
     }
 
@@ -207,7 +157,8 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                 .setMessage("Are you sure you want to log out?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        //  	ParseUser.logOut();
+                        progress.show();
+                        myDiaryHttpRequester.logout();
                         login();
                     }
                 })
@@ -215,7 +166,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.diary)
                 .show();
     }
 
@@ -231,6 +182,32 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    public void myDiaryProcessFinish(MyDiaryHttpResult result) {
+        progress.dismiss();
+        if(result != null) {
+            switch (result.getService()) {
+                case Name:
+                    if (result.getSuccess()) {
+                        String name = result.getData().replace("\"", "");
+                        MyDiaryUser.setName(name);
+                        invalidateOptionsMenu();
+                    } else {
+                        login();
+                    }
+                    break;
+                case Logout:
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    sharedPreferences.edit().remove("token").commit();
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            Utils.NoInternetOrServerAlert(this);
         }
     }
 }
