@@ -8,17 +8,11 @@
     <uses-sdk
         android:minSdkVersion="17"
         android:targetSdkVersion="21" />
-
+    <receiver android:name="com.example.mydiary.AlarmManagerBroadcastReceiver"></receiver>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <android:uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
     <application
         android:allowBackup="true"
@@ -46,6 +40,7 @@
             android:label="@string/title_activity_register"
             android:screenOrientation="portrait">
         </activity>
+        <receiver android:name="com.example.mydiary.AlarmManagerBroadcastReceiver"></receiver>
     </application>
 
 </manifest>

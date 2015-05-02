@@ -2,13 +2,17 @@ package com.example.mydiary;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -20,6 +24,9 @@ import android.view.WindowManager;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.GregorianCalendar;
 
 public class HomeActivity extends FragmentActivity implements ActionBar.TabListener, OnMenuItemClickListener, IMyDiaryHttpResponse {
     private final int REQ_CODE_LOGIN = 200;
@@ -27,11 +34,15 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
     private IMyDiaryHttpResponse context = this;
     private MyDiaryHttpRequester myDiaryHttpRequester;
-    private ViewPager viewPager;
+    public ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     private TextView name;
     private ProgressDialog progress;
+
+    public ViewPager getViewPager(){
+        return this.viewPager;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,19 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
 
         checkIfLogged();
+
+
+        //-----------------------------------
+//        Intent intent = new Intent(this, Mote.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 1253, intent, PendingIntent.FLAG_UPDATE_CURRENT|  Intent.FILL_IN_DATA);
+//        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+//        GregorianCalendar cal = Utils.getGregorianCalendarFromString("2015-05-02T05:54:00");
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),pendingIntent );
+//        AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+//        alarm.SetAlarm(this);
+//        alarm.setOnetimeTimer(this);
+
+       // Toast.makeText(this, "Alarm worked.", Toast.LENGTH_LONG).show();
     }
 
     public void checkIfLogged(){
@@ -78,7 +102,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
             login();
         } else {
             progress = ProgressDialog.show(this, null, null, true);
-            MyDiaryUser.setToken(accessToken);
+            MyDiaryUserModel.setToken(accessToken);
             myDiaryHttpRequester.getName();
         }
     }
@@ -86,7 +110,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
     //TODO: check if these are needed
     @Override
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
-        viewPager.setCurrentItem(tab.getPosition());
+        //viewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
@@ -118,7 +142,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
     private void setUpPopupMenu(Menu menu){
         this.name = new TextView(this);
-        this.name.setText(MyDiaryUser.getName());
+        this.name.setText(MyDiaryUserModel.getName());
         this.name.setPadding(5, 0, 5, 0);
         this.name.setTextSize(20);
         this.name.setOnClickListener(new OnClickListener() {
@@ -170,6 +194,19 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                 .show();
     }
 
+    private void noConnectivity() {
+        new AlertDialog.Builder(this)
+                .setTitle("No connection to internet or server")
+                .setMessage("Please check your connection. You will be redirected to the login screen")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        login();
+                    }
+                })
+                .setIcon(R.drawable.diary)
+                .show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -193,7 +230,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                 case Name:
                     if (result.getSuccess()) {
                         String name = result.getData().replace("\"", "");
-                        MyDiaryUser.setName(name);
+                        MyDiaryUserModel.setName(name);
                         invalidateOptionsMenu();
                     } else {
                         login();
@@ -207,7 +244,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                     break;
             }
         } else {
-            Utils.NoInternetOrServerAlert(this);
+            noConnectivity();
         }
     }
 }

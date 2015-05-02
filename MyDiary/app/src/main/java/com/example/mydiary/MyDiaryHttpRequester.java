@@ -5,8 +5,8 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by Liza on 18.4.2015 г..
@@ -21,14 +21,21 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
     private final String URL_REGISTER = URL_BASE + "api/Account/Register";
     private final String URL_NAME = URL_BASE + "api/Account/UserName";
     private final String URL_LOGOUT = URL_BASE + "api/Account/Logout";
-    private final String URL_SEND_NOTE = URL_BASE + "api/Notes";
+    private final String URL_SEND_NOTE = URL_BASE + "api/Notes/SaveNote";
+    private final String URL_GET_NOTES_FOR_DATE = URL_BASE + "api/Notes/GetNotes";
+    private final String URL_DELETE_NOTE = URL_BASE + "api/Notes/DeleteNote";
+    private final String URL_GET_DATES_WITH_NOTES = URL_BASE + "api/Notes/GetDatesWithNotes";
 
-    private final String METHOD_POST = "POST";
     private final String METHOD_GET = "GET";
+    private final String METHOD_POST = "POST";
+    private final String METHOD_DELETE = "DELETE";
 
     private final String FORMAT_LOGIN = "grant_type=password&username=%s&password=%s";
     private final String FORMAT_REGISTER = "Email=%s&Password=%s&ConfirmPassword=%s&Name=%s";
     private final String FORMAT_SAVE_NOTE = "NoteText=%s&Date=%s";
+    private final String FORMAT_GET_NOTES_FOR_DATE = "?date=%s";
+    private final String FORMAT_DELETE_NOTE = "?id=%d";
+    private final String FORMAT_GET_DATES_WITH_NOTES = "?month=%d&year=%d";
 
     private IAsyncResponse context = this;
     private IMyDiaryHttpResponse delegate;
@@ -73,7 +80,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             URL_LOGOUT,
                             METHOD_POST,
                             "",
-                            MyDiaryUser.getToken());
+                            MyDiaryUserModel.getToken());
         } catch(Exception ex) {
             Log.d(TAG, "Exception in logout: " + ex.toString() + " | Message: " + ex.getMessage());
         }
@@ -86,7 +93,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             URL_NAME,
                             METHOD_GET,
                             "",
-                            MyDiaryUser.getToken());
+                            MyDiaryUserModel.getToken());
         } catch(Exception ex) {
             Log.d(TAG, "Exception in getName: " + ex.toString() + " | Message: " + ex.getMessage());
         }
@@ -94,18 +101,59 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
 
     public void sendNote(String noteText, GregorianCalendar calendar){
         try {
-            SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-            fmt.setCalendar(calendar);
-            String date = fmt.format(calendar.getTime());
+            String date = Utils.getDateTimeStringFromCalendar(calendar);
             final String urlParameters = String.format(FORMAT_SAVE_NOTE, noteText, date);
             new HttpRequester(context)
                     .execute(
                             URL_SEND_NOTE,
                             METHOD_POST,
                             urlParameters,
-                            MyDiaryUser.getToken());
+                            MyDiaryUserModel.getToken());
         } catch(Exception ex) {
             Log.d(TAG, "Exception in sendNote: " + ex.toString() + " | Message: " + ex.getMessage());
+        }
+    }
+
+    public void getNotesForDate(GregorianCalendar calendar){
+        try{
+        String date = Utils.getDateStringFromCalendar(calendar);
+        String url = URL_GET_NOTES_FOR_DATE + String.format(FORMAT_GET_NOTES_FOR_DATE, date);
+            new HttpRequester(context)
+                    .execute(
+                            url,
+                            METHOD_GET,
+                            "",
+                            MyDiaryUserModel.getToken());
+        } catch(Exception ex) {
+            Log.d(TAG, "Exception in getNotesForDate: " + ex.toString() + " | Message: " + ex.getMessage());
+        }
+    }
+
+    public void deleteNote(int id){
+        try{
+            String url = URL_DELETE_NOTE + String.format(FORMAT_DELETE_NOTE, id);
+            new HttpRequester(context)
+                    .execute(
+                            url,
+                            METHOD_DELETE,
+                            "",
+                            MyDiaryUserModel.getToken());
+        } catch(Exception ex) {
+            Log.d(TAG, "Exception in deleteNote: " + ex.toString() + " | Message: " + ex.getMessage());
+        }
+    }
+
+    public void getDatesWithNotes(int month, int year){
+        try{
+            String url = URL_GET_DATES_WITH_NOTES + String.format(FORMAT_GET_DATES_WITH_NOTES, month, year);
+            new HttpRequester(context)
+                    .execute(
+                            url,
+                            METHOD_GET,
+                            "",
+                            MyDiaryUserModel.getToken());
+        } catch(Exception ex) {
+            Log.d(TAG, "Exception in getDatesWithNotes: " + ex.toString() + " | Message: " + ex.getMessage());
         }
     }
 
@@ -114,12 +162,17 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
         try {
             MyDiaryHttpResult result = null;
             if(data != null) {
-                JSONObject obj = Utils.makeJson(data);
+                JSONObject obj = Json.makeJson(data);
                 if(obj != null) {
                     Log.d(TAG, "data: " + data);
                     boolean success = obj.getBoolean("success");
                     MyDiaryHttpServices service = null;
                     String url = obj.getString("url");
+                    int endIndex = url.indexOf('?');
+                    if(endIndex > 0) {
+                        url = url.substring(0, endIndex);
+                    }
+
                     if (url.equalsIgnoreCase(URL_LOGIN)) {
                         service = MyDiaryHttpServices.Login;
                     } else if (url.equalsIgnoreCase(URL_REGISTER)) {
@@ -130,6 +183,12 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                         service = MyDiaryHttpServices.Logout;
                     } else if(url.equalsIgnoreCase(URL_SEND_NOTE)) {
                         service = MyDiaryHttpServices.SaveNote;
+                    } else if(url.equalsIgnoreCase(URL_GET_NOTES_FOR_DATE)) {
+                        service = MyDiaryHttpServices.GetNotesForDate;
+                    } else if(url.equalsIgnoreCase(URL_DELETE_NOTE)) {
+                        service = MyDiaryHttpServices.DeleteNote;
+                    } else if(url.equalsIgnoreCase(URL_GET_DATES_WITH_NOTES)) {
+                        service = MyDiaryHttpServices.GetDatesWithNotes;
                     }
 
                     String theData = obj.getString("data");

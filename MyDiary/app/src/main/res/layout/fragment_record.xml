@@ -51,4 +51,13 @@
         android:layout_alignBottom="@+id/txtSpeechInput"
         android:layout_alignEnd="@+id/txtSpeechInput" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/textViewDateForNote"
+        android:textColor="@color/caldroid_black"
+        android:layout_below="@+id/txtSpeechInput"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

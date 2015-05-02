@@ -8,5 +8,8 @@ public enum MyDiaryHttpServices {
     Logout,
     Register,
     Name,
-    SaveNote
+    SaveNote,
+    GetNotesForDate,
+    DeleteNote,
+    GetDatesWithNotes
 }

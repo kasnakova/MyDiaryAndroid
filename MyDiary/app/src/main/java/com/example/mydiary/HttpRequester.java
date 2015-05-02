@@ -12,6 +12,7 @@ import android.util.Log;
 public class HttpRequester extends AsyncTask<String, Void, String> {
     private final String USER_AGENT = "Mozilla/5.0";
     private final String TAG = "HttpRequester";
+    private final int CONNECTION_TIMEOUT = 10000;
     private IAsyncResponse delegate;
     private HttpURLConnection connection;
 
@@ -29,28 +30,21 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
             connection = (HttpURLConnection) objUrl.openConnection();
 
             connection.setRequestMethod(requestMethod);
-            connection.setRequestProperty("User-Agent", USER_AGENT);
-            connection.setConnectTimeout(10000);
+            //connection.setRequestProperty("User-Agent", USER_AGENT);
+            connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
             if(params.length > 3){
                 connection.setRequestProperty("Authorization", "Bearer " + params[3]);
             }
 
             if (requestMethod == "POST") {
-                //con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-//                con.setRequestProperty("Email", "asmkaslj@abv.bg");
-//                con.setRequestProperty("Name", "KDkls;");
-//                con.setRequestProperty("Password", "1234567");
-//                con.setRequestProperty("ConfirmPassword", "1234567");
-
-                connection.setRequestProperty("Content-Type",
-                        "application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 connection.setUseCaches (true);
                 connection.setDoOutput(true);
                 connection.setDoInput(true);
 
                 String urlParameters = params[2];
-                if(urlParameters != "") {
+                if(!(urlParameters.equals(""))) {
                     DataOutputStream wr = new DataOutputStream(
                             connection.getOutputStream());
                     wr.writeBytes(urlParameters);
@@ -89,7 +83,7 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
             try {
                 int responseCode = connection.getResponseCode();
                 if(responseCode == 401){
-                    return "{'success':'false','url':'" + url + "','data':'" + e.getMessage() + "'}";
+                    return "{'success':'false','url':'" + url + "','data':'" + e.getMessage() + "}";
                 }
             }catch (Exception ex){
                 Log.d(TAG, "Exception in the inner try catch: " + e.toString());

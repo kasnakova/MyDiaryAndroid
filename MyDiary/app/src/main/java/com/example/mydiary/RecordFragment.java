@@ -15,12 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RecordFragment extends Fragment implements IMyDiaryHttpResponse {
     private final int REQ_CODE_SPEECH_INPUT = 100;private EditText txtSpeechInput;
     private final String SUCCESSFULLY_SENT_NOTE = "Your note was successfully saved!";
 //TODO: maybe make better UI
+    private TextView textViewDateForNote;
     private Button btnSpeak;
     private Button buttonSaveToDb;
     private Button buttonClear;
@@ -36,6 +38,8 @@ public class RecordFragment extends Fragment implements IMyDiaryHttpResponse {
         View rootView = inflater.inflate(R.layout.fragment_record, container, false);
         context = getActivity();
         txtSpeechInput = (EditText) rootView.findViewById(R.id.txtSpeechInput);
+        textViewDateForNote = (TextView) rootView.findViewById(R.id.textViewDateForNote);
+        textViewDateForNote.setText(Utils.getBGDateStringFromCalendar(new GregorianCalendar()));
         btnSpeak = (Button) rootView.findViewById(R.id.btnSpeak);
         buttonSaveToDb = (Button) rootView.findViewById(R.id.buttonSaveToDb);
         buttonClear = (Button) rootView.findViewById(R.id.buttonClear);
@@ -77,7 +81,7 @@ public class RecordFragment extends Fragment implements IMyDiaryHttpResponse {
             Utils.makeAlert(context, "Invalid note", "Your note can't be empty");
         } else {
             progress = ProgressDialog.show(context, null, null, true);
-            myDiaryHttpRequester.sendNote(noteText, new GregorianCalendar());
+            myDiaryHttpRequester.sendNote(noteText, CalendarFragment.SelectedDate);
         }
     }
     /**
@@ -120,6 +124,15 @@ public class RecordFragment extends Fragment implements IMyDiaryHttpResponse {
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if(isVisibleToUser && textViewDateForNote != null){
+            textViewDateForNote.setText(Utils.getBGDateStringFromCalendar(CalendarFragment.SelectedDate));
+        }
+    }
+
+    @Override
     public void myDiaryProcessFinish(MyDiaryHttpResult result) {
         progress.dismiss();
         if(result != null) {
@@ -127,7 +140,7 @@ public class RecordFragment extends Fragment implements IMyDiaryHttpResponse {
                 case SaveNote:
                     if (result.getSuccess()) {
                         //TODO: find out why this doesn't appear
-                        Toast.makeText(context, SUCCESSFULLY_SENT_NOTE, Toast.LENGTH_LONG);
+                        Toast.makeText(context, SUCCESSFULLY_SENT_NOTE, Toast.LENGTH_LONG).show();
                     } else {
                         //TODO: get these strings out of here
                         Utils.makeAlert(context, "A problem occurred", "Your note was not saved");

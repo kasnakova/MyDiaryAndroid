@@ -25,7 +25,6 @@
 </style>
 
  <style name="MyActionBar">
-        <item name="android:background">@drawable/tab_bar_background</item>
         <item name="android:gravity">center</item>
     </style>
     

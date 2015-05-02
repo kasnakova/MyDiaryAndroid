@@ -20,5 +20,6 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:20.0.0'
+    compile 'com.roomorama:caldroid:1.1.8'
     compile files('libs/bolts-android-1.1.4.jar')
 }

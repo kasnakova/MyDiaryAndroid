@@ -4,21 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/background_diary_right_page">
-     
-    <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:firstDayOfWeek="2" 
-        android:clickable="true" />
 
-    <TextView
-        android:id="@+id/textViewNote"
+    <fragment
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/calendarView" />
- 
+        android:name="com.example.mydiary.BlankForCalendarFragment"
+        android:id="@+id/fragmentCalendarView"
+        android:layout_marginLeft="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listViewNotes"
+        android:layout_marginLeft="50dp"
+        android:layout_below="@+id/fragmentCalendarView" />
+
 </RelativeLayout>

@@ -1,17 +1,25 @@
 package com.example.mydiary;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +54,6 @@ public class LoginActivity extends Activity implements  IMyDiaryHttpResponse {
                 login();
             }
         });
-
         this.buttonToRegister.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -54,6 +61,29 @@ public class LoginActivity extends Activity implements  IMyDiaryHttpResponse {
                 register();
             }
         });
+        editTextPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int result = actionId & EditorInfo.IME_MASK_ACTION;
+                switch(result) {
+                    case EditorInfo.IME_ACTION_DONE:
+                        buttonLogin.callOnClick();
+                        return true;
+                    default:
+                        break;
+                }
+
+                return  false;
+            }
+        });
+
+        //TODO: make it on boot as well
+//        AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+//        final String SOME_ACTION = "com.example.mydiary.AlarmManagerBroadcastReceiver";
+//        IntentFilter intentFilter = new IntentFilter(SOME_ACTION);
+//        registerReceiver(alarm, intentFilter);
+//       //alarm.SetAlarm(getApplicationContext());
+//        alarm.setOnetimeTimer(getApplicationContext());
     }
 
     private void login(){
@@ -109,12 +139,12 @@ public class LoginActivity extends Activity implements  IMyDiaryHttpResponse {
             if(result != null) {
                 switch (result.getService()) {
                     case Login:
-                        JSONObject obj = Utils.makeJson(result.getData());
+                        JSONObject obj = Json.makeJson(result.getData());
                         if (result.getSuccess()) {
                             String accessToken = obj.getString("access_token");
                             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                             sharedPreferences.edit().putString("token", accessToken).commit();
-                            MyDiaryUser.setToken(accessToken);
+                            MyDiaryUserModel.setToken(accessToken);
                             Log.d(TAG, accessToken);
                             progress.show();
                             this.myDiaryHttpRequester.getName();
@@ -127,7 +157,7 @@ public class LoginActivity extends Activity implements  IMyDiaryHttpResponse {
                             Log.d(TAG, "name: " + result.getData());
                             //to remove the quotes
                             String name = result.getData().replace("\"", "");
-                            MyDiaryUser.setName(name);
+                            MyDiaryUserModel.setName(name);
                             Intent resultIntent = new Intent();
                             setResult(Activity.RESULT_OK, resultIntent);
                             finish();
