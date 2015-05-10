@@ -6,7 +6,30 @@
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="100"
+        android:icon="@drawable/logout"
+        android:background="@null"
         android:title="@string/action_logout"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/settings"
+        android:title="@string/action_settings"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="100"
+        android:icon="@drawable/help"
+        android:title="@string/action_help"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_reminders"
+        android:orderInCategory="100"
+        android:icon="@drawable/alarm"
+        android:title="@string/action_reminders"
+        app:showAsAction="always"/>
 
 </menu>
