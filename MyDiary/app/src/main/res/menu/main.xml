@@ -4,12 +4,11 @@
     tools:context="com.example.androidapp.MainActivity" >
 
     <item
-        android:id="@+id/action_logout"
+        android:id="@+id/action_reminders"
         android:orderInCategory="100"
-        android:icon="@drawable/logout"
-        android:background="@null"
-        android:title="@string/action_logout"
-        app:showAsAction="ifRoom"/>
+        android:icon="@drawable/alarm"
+        android:title="@string/action_reminders"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/action_settings"
@@ -26,10 +25,20 @@
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/action_reminders"
+        android:id="@+id/action_logout"
         android:orderInCategory="100"
-        android:icon="@drawable/alarm"
-        android:title="@string/action_reminders"
-        app:showAsAction="always"/>
+        android:icon="@drawable/logout"
+        android:background="@null"
+        android:visible="false"
+        android:title="@string/action_logout"
+        app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_online"
+        android:orderInCategory="100"
+        android:icon="@drawable/online"
+        android:visible="false"
+        android:background="@null"
+        android:title="@string/action_online"
+        app:showAsAction="ifRoom"/>
 </menu>
