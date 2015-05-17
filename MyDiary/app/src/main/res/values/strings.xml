@@ -37,5 +37,17 @@
     <string name="action_cancel_all">Cancel all</string>
     <string name="action_login">Login</string>
     <string name="action_name">Name</string>
+    <string name="text_name">Your name</string>
+    <string name="help_welcome">Hello, Welcome to My Diary!</string>
+    <string name="help_description">My diary is an application that will help you keep your memories save and a few clicks away.\nHere are some tips:</string>
+    <string name="help_diary">In the home screen you can swipe left or right to record notes/reminders or see the calender</string>
+    <string name="help_offline">If you don\'t have internet you can use the offline mode - this enables you to use the reminder functionality only.</string>
+    <string name="help_mike">If writing is too troublesome for you then use google\'s speech recognition. It will write for you!</string>
+    <string name="help_lock">Afraid someone might read your notes? Not a problem - put a password only you know on your darkest secrets.</string>
+    <string name="help_reminders">Too much stuff to remember? Make a reminder and manage all your reminders easily.</string>
+    <string name="help_save">Save your notes with us. The only thing you\'ll need is our app and for you to login to see them later.</string>
+    <string name="help_calendar">Easily manage your notes with our calendar. If you have internet and are logged in the days for which you have notes will be marked with green</string>
+    <string name="help_delete">If you want to delete a note or a reminder just long press it.</string>
+    <string name="help_menu">Not all the available options are in the action bar - press the menu button on your phone for more.</string>
 
 </resources>

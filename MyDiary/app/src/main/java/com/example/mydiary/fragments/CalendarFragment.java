@@ -55,7 +55,7 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
- 
+
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
         context = (HomeActivity) getActivity();
         listViewNotes = (ListView) rootView.findViewById(R.id.listViewNotes);
@@ -76,11 +76,23 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
         myDiaryHttpRequester.setIsOffline(SettingsManager.isOffline(context));
     }
 
-    private void setUpCalendar(){
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser && myDiaryHttpRequester != null) {
+            getDatesWithNotes();
+            myDiaryHttpRequester.getNotesForDate(SelectedDate);
+        }
+    }
+
+    private void getDatesWithNotes(){
         int month = SelectedDate.get(Calendar.MONTH) + 1;
         int year = SelectedDate.get(Calendar.YEAR);
         myDiaryHttpRequester.getDatesWithNotes(month, year);
+    }
 
+    private void setUpCalendar(){
+        getDatesWithNotes();
         CaldroidListener caldroidListener = new CaldroidListener() {
             @Override
             public void onSelectDate(Date date, View view) {
@@ -99,7 +111,7 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
             public void onChangeMonth(int month, int year) {
                 if(dates != null && dates.size() > 0) {
                     int previousMonth = dates.get(0).get(Calendar.MONTH) + 1;
-                    setDatesWithNotes(R.color.caldroid_black);
+                    setDatesWithNotes(R.color.caldroid_black, dates);
                 }
 
                 myDiaryHttpRequester.getDatesWithNotes(month, year);
@@ -119,7 +131,7 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
         caldroidFragment.setCaldroidListener(caldroidListener);
     }
 
-    private void setDatesWithNotes(int color){
+    private void setDatesWithNotes(int color, ArrayList<GregorianCalendar> dates){
         for (int i = 0; i < dates.size(); i++){
             Date date = dates.get(i).getTime();
             caldroidFragment.setTextColorForDate(color, date);
@@ -227,7 +239,15 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
                     break;
                 case DeleteNote:
                     if(result.getSuccess()){
-                        adapter.remove(noteToDelete);
+                        notes.remove(noteToDelete);
+                        if(notes.size() == 0){
+                            ArrayList<GregorianCalendar> dateToDelete = new ArrayList<GregorianCalendar>();
+                            dateToDelete.add(noteToDelete.getCalendarDate());
+                            setDatesWithNotes(R.color.caldroid_black, dateToDelete);
+                            notes.add(new NoteModel(-1, Constants.NO_NOTES_FOR_DAY, null, null, false, true));
+                        }
+
+                        adapter.notifyDataSetChanged();
                     } else {
                         DialogManager.makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, Constants.MESSAGE_COULD_NOT_RETRIEVE_NOTES);
                     }
@@ -235,7 +255,7 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
                 case GetDatesWithNotes:
                     if(result.getSuccess()){
                         dates = JsonManager.makeGregorianCalendarArrayFromData(result.getData());
-                        setDatesWithNotes(R.color.dark_green);
+                        setDatesWithNotes(R.color.dark_green, dates);
                     } else {
                         DialogManager.makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, Constants.MESSAGE_COULD_NOT_RETRIEVE_NOTES);
                     }

@@ -16,7 +16,7 @@ import com.example.mydiary.utilities.Logger;
 public class HttpRequester extends AsyncTask<String, Void, String> {
     private final String USER_AGENT = "Mozilla/5.0";
     private final String TAG = "HttpRequester";
-    private final int CONNECTION_TIMEOUT = 10000;
+    private final int CONNECTION_TIMEOUT = 5000;
     private IAsyncResponse delegate;
     private HttpURLConnection connection;
 
@@ -35,6 +35,7 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
             connection.setRequestMethod(requestMethod);
             //connection.setRequestProperty("User-Agent", USER_AGENT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
+            connection.setReadTimeout(CONNECTION_TIMEOUT);
 
             if(params.length > 3){
                 connection.setRequestProperty("Authorization", "Bearer " + params[3]);

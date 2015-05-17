@@ -15,7 +15,7 @@
         android:inputType="textEmailAddress"
         android:ems="10"
         android:id="@+id/editTextRegisterEmail"
-        android:text="@string/email_text"
+        android:hint="@string/email_text"
         android:layout_marginTop="190dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -26,7 +26,7 @@
         android:inputType="textPassword"
         android:ems="10"
         android:id="@+id/editTextRegisterPassword"
-        android:text="@string/password_text"
+        android:hint="@string/password_text"
         android:layout_below="@+id/editTextRegisterName"
         android:layout_centerHorizontal="true" />
 
@@ -36,14 +36,14 @@
         android:inputType="textPassword"
         android:ems="10"
         android:id="@+id/editTextRegisterConfirmPassword"
-        android:text="@string/password_text"
+        android:hint="@string/password_text"
         android:layout_below="@+id/editTextRegisterPassword"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/register_button_text"
+        android:hint="@string/password_text"
         android:id="@+id/buttonRegister"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="55dp"
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:text="@string/name_text"
+        android:hint="@string/name_text"
         android:ems="10"
         android:id="@+id/editTextRegisterName"
         android:layout_below="@+id/editTextRegisterEmail"

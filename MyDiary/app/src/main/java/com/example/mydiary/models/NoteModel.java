@@ -10,6 +10,7 @@ import java.util.GregorianCalendar;
 public class NoteModel {
     private int id;
     private String date;
+    private GregorianCalendar calendar;
     private String noteText;
     private NoteType noteType;
     private boolean hasPassword;
@@ -43,9 +44,13 @@ public class NoteModel {
     public boolean getHasPassword(){
         return this.hasPassword;
     }
+    public GregorianCalendar getCalendarDate(){
+        return this.calendar;
+    }
 
     public void setDate(GregorianCalendar calendar){
         if(calendar != null) {
+            this.calendar = calendar;
             if (this.onlyTime) {
                 this.date = DateManager.getTimeStringFromCalendar(calendar);
             } else {

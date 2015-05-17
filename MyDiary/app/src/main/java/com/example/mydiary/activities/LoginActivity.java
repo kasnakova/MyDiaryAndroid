@@ -104,8 +104,9 @@ public class LoginActivity extends Activity implements IMyDiaryHttpResponse {
                         sharedPreferences.edit().putBoolean(Constants.IS_OFFLINE, true).commit();
                         myDiaryHttpRequester.setIsOffline(true);
                         Logger.getInstance().logMessage(TAG, "User switched to offline mode");
-                        Intent resultIntent = new Intent();
-                        setResult(Activity.RESULT_OK, resultIntent);
+                        Intent resultIntent = new Intent(LoginActivity.this, HomeActivity.class);
+                        //setResult(Activity.RESULT_OK, resultIntent);
+                        startActivity(resultIntent);
                         finish();
                     }
                 })
@@ -200,8 +201,9 @@ public class LoginActivity extends Activity implements IMyDiaryHttpResponse {
                             //to remove the quotes
                             String name = result.getData().replace("\"", "");
                             MyDiaryUserModel.setName(name);
-                            Intent resultIntent = new Intent();
-                            setResult(Activity.RESULT_OK, resultIntent);
+                            Intent resultIntent = new Intent(LoginActivity.this, HomeActivity.class);
+                            //setResult(Activity.RESULT_OK, resultIntent);
+                            startActivity(resultIntent);
                             finish();
                         } else {
                             Logger.getInstance().logMessage(TAG, "Problem with getting the name. Result wasn't successful.");

@@ -68,8 +68,7 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
             checkIfLogged();
         }
 
-        //TODO: give it to Desi
-        //TODO: try it on dad's phone
+        //TODO: put the hints in the login
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 //
 //        sharedPreferences.edit().remove(Constants.REQUEST_CODES).commit();
@@ -227,12 +226,16 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         sharedPreferences.edit().putBoolean(Constants.IS_OFFLINE, false).commit();
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-        startActivityForResult(intent, REQ_CODE_LOGIN);
+        //startActivityForResult(intent, REQ_CODE_LOGIN);
+        startActivity(intent);
+        finish();
     }
 
     private void login() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-        startActivityForResult(intent, REQ_CODE_LOGIN);
+       // startActivityForResult(intent, REQ_CODE_LOGIN);
+        startActivity(intent);
+        finish();
     }
 
     private void logout() {
@@ -266,20 +269,20 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                 .show();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQ_CODE_LOGIN: {
-                if (resultCode == RESULT_CANCELED) {
-                    finish();
-                } else {
-                    invalidateOptionsMenu();
-                }
-                break;
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case REQ_CODE_LOGIN: {
+//                if (resultCode == RESULT_CANCELED) {
+//                    finish();
+//                } else {
+//                    invalidateOptionsMenu();
+//                }
+//                break;
+//            }
+//        }
+//    }
 
     @Override
     public void myDiaryProcessFinish(MyDiaryHttpResult result) {

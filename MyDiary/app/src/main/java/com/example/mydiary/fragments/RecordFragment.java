@@ -159,6 +159,7 @@ public class RecordFragment extends Fragment implements IMyDiaryHttpResponse, IR
                 } else {
                     notePassword = pass;
                     dialog.dismiss();
+                    Toast.makeText(context, Constants.TOAST_SET_PASSWORD, Toast.LENGTH_LONG).show();
                 }
             }
         });
