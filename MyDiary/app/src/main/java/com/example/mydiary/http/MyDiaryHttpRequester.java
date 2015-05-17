@@ -10,6 +10,7 @@ import com.example.mydiary.models.MyDiaryUserModel;
 import com.example.mydiary.models.NoteType;
 import com.example.mydiary.utilities.DateManager;
 import com.example.mydiary.utilities.JsonManager;
+import com.example.mydiary.utilities.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,7 +85,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             METHOD_POST,
                             urlParameters);
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in register: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -102,7 +103,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             METHOD_POST,
                             urlParameters);
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in login: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -119,7 +120,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             "",
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in logout: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -136,7 +137,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             "",
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in getName: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -160,7 +161,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             urlParameters,
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in sendNote: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -179,7 +180,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             "",
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in getNotesForDate: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -197,7 +198,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             "",
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in deleteNote: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -215,7 +216,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             "",
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in getDatesWithNotes: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -233,7 +234,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
                             "",
                             MyDiaryUserModel.getToken());
         } catch(Exception ex) {
-            Log.d(TAG, "Exception in getDecryptedNoteText: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 
@@ -281,7 +282,7 @@ public class MyDiaryHttpRequester implements IAsyncResponse {
 
             delegate.myDiaryProcessFinish(result);
         } catch (JSONException ex) {
-            Log.d(TAG, "JSONException: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 }

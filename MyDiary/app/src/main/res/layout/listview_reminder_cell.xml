@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/background_green_gradient">
 
     <TextView
         android:layout_width="wrap_content"
@@ -8,6 +9,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/textViewReminderDate"
         android:text="12/12/2001 45;45;45"
+        android:textColor="@color/caldroid_black"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/imageView" />
 
@@ -17,13 +19,14 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/textViewReminderText"
+        android:textColor="@color/caldroid_black"
         android:layout_alignBottom="@+id/imageView"
         android:layout_toEndOf="@+id/imageView"
         android:layout_below="@+id/textViewReminderDate" />
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:id="@+id/imageView"
         android:background="@drawable/alarm"
         android:layout_alignParentTop="true"

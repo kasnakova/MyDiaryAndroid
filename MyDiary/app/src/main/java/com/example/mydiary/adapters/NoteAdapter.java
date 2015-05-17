@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.mydiary.R;
 import com.example.mydiary.models.NoteModel;
+import com.example.mydiary.utilities.Constants;
 
 import java.util.List;
 
@@ -52,12 +53,12 @@ public class NoteAdapter extends ArrayAdapter{
         String noteText = note.getNoteText();
         int image = R.drawable.unlock;
         if(note.getHasPassword()) {
-            noteText = "Password needed";
+            noteText = Constants.PASSWORD_NEEDED;
             image = R.drawable.lock;
         }
 
         holder.imageViewUnlock.setImageResource(image);
-        if(noteText.equals(context.getResources().getString(R.string.no_notes_for_day))){
+        if(noteText.equals(Constants.NO_NOTES_FOR_DAY)){
             holder.imageViewUnlock.setVisibility(View.GONE);
         } else {
             holder.imageViewUnlock.setVisibility(View.VISIBLE);

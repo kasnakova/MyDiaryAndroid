@@ -5,7 +5,7 @@ import java.util.GregorianCalendar;
 /**
  * Created by Liza on 4.5.2015 г..
  */
-public class ReminderModel {
+public class ReminderModel implements Comparable<ReminderModel> {
     private String noteText;
     private GregorianCalendar date;
 
@@ -20,5 +20,18 @@ public class ReminderModel {
 
     public GregorianCalendar getDate(){
         return this.date;
+    }
+
+    public void setNoteText(String noteText){
+        this.noteText = noteText;
+    }
+
+    public void setDate(GregorianCalendar date){
+        this.date = date;
+    }
+
+    @Override
+    public int compareTo(ReminderModel other) {
+        return getDate().compareTo(other.getDate());
     }
 }

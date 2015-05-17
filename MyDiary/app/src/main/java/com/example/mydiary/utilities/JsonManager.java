@@ -23,7 +23,7 @@ public class JsonManager {
             JSONObject obj = new JSONObject(data);
             return obj;
         } catch (JSONException e) {
-            Log.d(TAG, "JSONException: " + e.toString() + " | Message: " + e.getMessage());
+            Logger.getInstance().logError(TAG, e);
             return null;
         }
     }
@@ -31,9 +31,9 @@ public class JsonManager {
     public static String getErrorMessage(String data){
         try {
             JSONObject obj = JsonManager.makeJson(data);
-            return obj.getString("Message");
+            return obj.getString(Constants.JSON_MESSAGE);
         } catch (JSONException e) {
-            Log.d(TAG, "JSONException: " + e.toString() + " | Message: " + e.getMessage());
+            Logger.getInstance().logError(TAG, e);
             return null;
         }
     }
@@ -44,16 +44,16 @@ public class JsonManager {
             JSONArray jsonArray = new JSONArray(data);
             for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject noteObj = JsonManager.makeJson(jsonArray.get(i).toString());
-                int id = noteObj.getInt("Id");
-                String noteText = noteObj.getString("NoteText");
-                boolean hasPassword = noteObj.getBoolean("HasPassword");
-                NoteType noteType = NoteType.values()[noteObj.getInt("NoteType")];
-                GregorianCalendar calendar = DateManager.getGregorianCalendarFromString(noteObj.getString("Date"));
+                int id = noteObj.getInt(Constants.JSON_ID);
+                String noteText = noteObj.getString(Constants.JSON_NOTE_TEXT);
+                boolean hasPassword = noteObj.getBoolean(Constants.JSON_HAS_PASSWORD);
+                NoteType noteType = NoteType.values()[noteObj.getInt(Constants.JSON_NOTE_TYPE)];
+                GregorianCalendar calendar = DateManager.getGregorianCalendarFromString(noteObj.getString(Constants.JSON_DATE));
                 NoteModel note = new NoteModel(id, noteText, calendar, noteType, hasPassword, true);
                 notes.add(note);
             }
         } catch (JSONException e) {
-            Log.d(TAG, "JSONException: " + e.toString() + " | Message: " + e.getMessage());
+            Logger.getInstance().logError(TAG, e);
         }
 
         return notes;
@@ -68,7 +68,7 @@ public class JsonManager {
                 dates.add(calendar);
             }
         } catch (JSONException e) {
-            Log.d(TAG, "JSONException: " + e.toString() + " | Message: " + e.getMessage());
+            Logger.getInstance().logError(TAG, e);
         }
 
         return dates;

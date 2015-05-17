@@ -2,6 +2,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.mydiary.activities.ReminderActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_home"
+        android:orderInCategory="100"
+        android:icon="@drawable/home"
+        android:title="@string/action_home"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_add"
+        android:orderInCategory="100"
+        android:icon="@drawable/add"
+        android:title="@string/action_add"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_cancel_all"
+        android:orderInCategory="100"
+        android:icon="@drawable/clear"
+        android:title="@string/action_cancel_all"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/settings"
+        android:title="@string/action_settings"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="100"
+        android:icon="@drawable/help"
+        android:title="@string/action_help"
+        app:showAsAction="always"/>
+
+
 </menu>

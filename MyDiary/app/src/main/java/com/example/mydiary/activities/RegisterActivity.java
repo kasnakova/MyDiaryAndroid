@@ -2,8 +2,8 @@ package com.example.mydiary.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -15,14 +15,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.mydiary.Constants;
+import com.example.mydiary.utilities.Constants;
 import com.example.mydiary.http.MyDiaryHttpRequester;
 import com.example.mydiary.http.MyDiaryHttpResult;
 import com.example.mydiary.R;
 import com.example.mydiary.utilities.DialogManager;
 import com.example.mydiary.utilities.JsonManager;
 import com.example.mydiary.interfaces.IMyDiaryHttpResponse;
-import com.example.mydiary.utilities.Utils;
+import com.example.mydiary.utilities.Logger;
+import com.example.mydiary.utilities.SettingsManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +44,7 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        this.myDiaryHttpRequester = new MyDiaryHttpRequester(this, Utils.isOffline(this), this);
+        this.myDiaryHttpRequester = new MyDiaryHttpRequester(this, SettingsManager.isOffline(this), this);
 
         this.editTextEmail = (EditText) findViewById(R.id.editTextRegisterEmail);
         this.editTextName = (EditText) findViewById(R.id.editTextRegisterName);
@@ -82,33 +83,33 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
         String password = this.editTextPassword.getText().toString();
         String confirmPassword = this.editTextConfirmPassword.getText().toString();
 
-        if(email == null || email.equals("")){
-            DialogManager.makeAlert(this, "Invalid input", "Email cannot be empty!");
+        if(email == null || email.equals(Constants.EMPTY_STRING)){
+            DialogManager.makeAlert(this, Constants.TITLE_INVALID_INPUT, Constants.MESSAGE_EMAIL_CANNOT_BE_EMPTY);
             return;
         }
 
-        if(name == null || name.equals("")){
-            DialogManager.makeAlert(this, "Invalid input", "Name cannot be empty!");
+        if(name == null || name.equals(Constants.EMPTY_STRING)){
+            DialogManager.makeAlert(this, Constants.TITLE_INVALID_INPUT, Constants.MESSAGE_NAME_CANNOT_BE_EMPTY);
             return;
         }
 
-        if(password == null || password.equals("")){
-            DialogManager.makeAlert(this, "Invalid input", "Password cannot be empty!");
+        if(password == null || password.equals(Constants.EMPTY_STRING)){
+            DialogManager.makeAlert(this, Constants.TITLE_INVALID_INPUT, Constants.MESSAGE_PASSWORD_CANNOT_BE_EMPTY);
             return;
         }
 
-        if(confirmPassword == null || confirmPassword.equals("")){
-            DialogManager.makeAlert(this, "Invalid input", "Password confirmation cannot be empty!");
+        if(confirmPassword == null || confirmPassword.equals(Constants.EMPTY_STRING)){
+            DialogManager.makeAlert(this, Constants.TITLE_INVALID_INPUT, Constants.MESSAGE_PASSWORD_CONFIRM_CANNOT_BE_EMPTY);
             return;
         }
 
         if(!password.equals(confirmPassword)){
-            DialogManager.makeAlert(this, "Invalid input", "The password confirmation doesn't match!");
+            DialogManager.makeAlert(this, Constants.TITLE_INVALID_INPUT, Constants.MESSAGE_PASSWORD_CONFIRM_NOT_MATCH);
             return;
         }
 
         if(password.length() < Constants.MIN_PASSWORD_LENGTH){
-            DialogManager.makeAlert(this, "Invalid input", "The password must be at least " + Constants.MIN_PASSWORD_LENGTH + " characters long!");
+            DialogManager.makeAlert(this, Constants.TITLE_INVALID_INPUT, String.format(Constants.MESSAGE_PASSWORD_LENGTH, Constants.MIN_PASSWORD_LENGTH));
             return;
         }
 
@@ -119,6 +120,13 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
+        menu.add(0, 0, 1, getString(R.string.action_help)).setIcon(R.drawable.help).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                onHelpMenuItemClicked();
+                return true;
+            }
+        }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
 
@@ -126,11 +134,17 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_help) {
+            onHelpMenuItemClicked();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void onHelpMenuItemClicked(){
+        Intent intentHelp = new Intent(this, HelpActivity.class);
+        startActivity(intentHelp);
     }
 
     @Override
@@ -141,8 +155,8 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
                     case Register:
                         if (result.getSuccess()) {
                             new AlertDialog.Builder(this)
-                                    .setTitle("Successful registration")
-                                    .setMessage("You may login now")
+                                    .setTitle(Constants.TITLE_SUCCESSFUL_REGISTRATION)
+                                    .setMessage(Constants.MESSAGE_SUCCESSFUL_REGISTRATION)
                                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
                                             finish();
@@ -150,11 +164,13 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
                                     })
                                     .setIcon(R.drawable.diary)
                                     .show();
+                            Logger.getInstance().logMessage(TAG, "Successful registration");
                         } else {
                             JSONObject obj = JsonManager.makeJson(result.getData());
-                            JSONObject errorObj = JsonManager.makeJson(obj.getString("ModelState"));
-                            String error = errorObj.getJSONArray("").getString(0);
-                            DialogManager.makeAlert(this, "Problem with registering", error);
+                            JSONObject errorObj = JsonManager.makeJson(obj.getString(Constants.JSON_MODEL_STATE));
+                            String error = errorObj.getJSONArray(Constants.EMPTY_STRING).getString(0);
+                            DialogManager.makeAlert(this, Constants.TITLE_PROBLEM_REGISTERING, error);
+                            Logger.getInstance().logMessage(TAG, "Unsuccessful registration: " + error);
                         }
                         break;
                     default:
@@ -162,9 +178,10 @@ public class RegisterActivity extends Activity implements IMyDiaryHttpResponse {
                 }
             } else {
                 DialogManager.NoInternetOrServerAlert(this);
+                Logger.getInstance().logMessage(TAG, "The result of the http request was null");
             }
         }catch(JSONException ex){
-            Log.d(TAG, "JSONException: " + ex.toString() + " | Message: " + ex.getMessage());
+            Logger.getInstance().logError(TAG, ex);
         }
     }
 }

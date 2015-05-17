@@ -8,7 +8,6 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.support.v4.app.FragmentTransaction;
 
+import com.example.mydiary.utilities.Constants;
 import com.example.mydiary.utilities.DateManager;
 import com.example.mydiary.activities.HomeActivity;
 import com.example.mydiary.utilities.DialogManager;
@@ -32,7 +32,8 @@ import com.example.mydiary.adapters.NoteAdapter;
 import com.example.mydiary.models.NoteModel;
 import com.example.mydiary.R;
 import com.example.mydiary.interfaces.IMyDiaryHttpResponse;
-import com.example.mydiary.utilities.Utils;
+import com.example.mydiary.utilities.Logger;
+import com.example.mydiary.utilities.SettingsManager;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
@@ -40,6 +41,7 @@ import java.util.GregorianCalendar;
 
 public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
     final CaldroidFragment caldroidFragment = new CaldroidFragment();
+    private final String TAG = "CalendarFragment";
 	private ListView listViewNotes;
     private HomeActivity context;
     private NoteAdapter adapter;
@@ -57,16 +59,21 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
         context = (HomeActivity) getActivity();
         listViewNotes = (ListView) rootView.findViewById(R.id.listViewNotes);
-        myDiaryHttpRequester = new MyDiaryHttpRequester(this, Utils.isOffline(context), context);
+        myDiaryHttpRequester = new MyDiaryHttpRequester(this, SettingsManager.isOffline(context), context);
         SelectedDate = new GregorianCalendar();
         myDiaryHttpRequester.getNotesForDate(SelectedDate);
-//TODO: add settings and user can choose from which day the week begins
         setUpCalendar();
         FragmentTransaction t = getFragmentManager().beginTransaction();
         t.replace(R.id.fragmentCalendarView, caldroidFragment);
         t.commit();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        myDiaryHttpRequester.setIsOffline(SettingsManager.isOffline(context));
     }
 
     private void setUpCalendar(){
@@ -98,6 +105,16 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
                 myDiaryHttpRequester.getDatesWithNotes(month, year);
             }
         };
+
+        int firstDayOfWeek = CaldroidFragment.SUNDAY;
+        if(SettingsManager.isMondayFirstDayOfWeek(context)) {
+            firstDayOfWeek = CaldroidFragment.MONDAY;
+        }
+
+        Bundle args = new Bundle();
+        args.putInt(CaldroidFragment.START_DAY_OF_WEEK, firstDayOfWeek);
+        args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
+        caldroidFragment.setArguments(args);
 
         caldroidFragment.setCaldroidListener(caldroidListener);
     }
@@ -142,7 +159,7 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
         dialog.setContentView(R.layout.dialog_unlock);
-        dialog.setTitle("Enter password");
+        dialog.setTitle(Constants.TITLE_UNLOCK_NOTE);
         dialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.diary);
         final EditText editTextUnlock = (EditText) dialog.findViewById(R.id.editTextUnlockPassword);
         Button buttonUnlockCancel = (Button) dialog.findViewById(R.id.buttonUnlockCancel);
@@ -158,7 +175,7 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
             public void onClick(View view) {
                 String password = editTextUnlock.getText().toString();
                 if(password.length() < 6){
-                    DialogManager.makeAlert(context, "Invalid password", "Password must be at least 6 characters long!");
+                    DialogManager.makeAlert(context, Constants.TITLE_INVALID_PASSWORD, String.format(Constants.MESSAGE_PASSWORD_LENGTH, Constants.MIN_PASSWORD_LENGTH));
                 } else {
                     myDiaryHttpRequester.getDecryptedNoteText(note.getId(), password);
                     dialog.dismiss();
@@ -172,8 +189,8 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
     private void deleteNote(){
         final int id = noteToDelete.getId();
         new AlertDialog.Builder(context)
-                .setTitle("Delete note")
-                .setMessage("Are you sure you want to delete this valuable memory?")
+                .setTitle(Constants.TITLE_DELETE_NOTE)
+                .setMessage(Constants.MESSAGE_DELETE_NOTE)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         myDiaryHttpRequester.deleteNote(id);
@@ -200,19 +217,19 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
                     if(result.getSuccess()){
                         notes = JsonManager.makeNotesFromJson(result.getData());
                         if(notes.size() == 0){
-                            notes.add(new NoteModel(-1, context.getResources().getString(R.string.no_notes_for_day), null, null, false, true));
+                            notes.add(new NoteModel(-1, Constants.NO_NOTES_FOR_DAY, null, null, false, true));
                         }
 
                         populateNoteListView();
                     } else {
-                        DialogManager.makeAlert(context, "A problem occurred", "Sorry, we couldn't retrieve your notes");
+                        DialogManager.makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, Constants.MESSAGE_COULD_NOT_RETRIEVE_NOTES);
                     }
                     break;
                 case DeleteNote:
                     if(result.getSuccess()){
                         adapter.remove(noteToDelete);
                     } else {
-                        DialogManager.makeAlert(context, "A problem occurred", "Sorry, we couldn't delete this note");
+                        DialogManager.makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, Constants.MESSAGE_COULD_NOT_RETRIEVE_NOTES);
                     }
                     break;
                 case GetDatesWithNotes:
@@ -220,18 +237,18 @@ public class CalendarFragment extends Fragment implements IMyDiaryHttpResponse {
                         dates = JsonManager.makeGregorianCalendarArrayFromData(result.getData());
                         setDatesWithNotes(R.color.dark_green);
                     } else {
-                        DialogManager.makeAlert(context, "A problem occurred", "Sorry, we couldn't retrieve your notes");
+                        DialogManager.makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, Constants.MESSAGE_COULD_NOT_RETRIEVE_NOTES);
                     }
                     break;
                 case GetDecryptedNoteText:
                     if(result.getSuccess()){
-                        String noteText = result.getData().replace("\"", "") + "\n";
+                        String noteText = result.getData().replace("\"", Constants.EMPTY_STRING) + "\n";
                         NoteModel note = (NoteModel) adapter.getItem(indexOfUnlockedNote);
                         note.setNoteText(noteText);
                         note.setHasPassword(false);
                         adapter.notifyDataSetChanged();
                     } else {
-                        DialogManager.makeAlert(context, "A problem occurred", JsonManager.getErrorMessage(result.getData()));
+                        DialogManager.makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, JsonManager.getErrorMessage(result.getData()));
             }
                     break;
                 default:

@@ -4,32 +4,37 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.SyncStateContract;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
-import com.example.mydiary.Constants;
+import com.example.mydiary.utilities.Constants;
+import com.example.mydiary.controllers.SettingsDialog;
 import com.example.mydiary.http.MyDiaryHttpRequester;
 import com.example.mydiary.http.MyDiaryHttpResult;
 import com.example.mydiary.models.MyDiaryUserModel;
 import com.example.mydiary.R;
 import com.example.mydiary.adapters.TabsPagerAdapter;
 import com.example.mydiary.interfaces.IMyDiaryHttpResponse;
-import com.example.mydiary.utilities.Utils;
+import com.example.mydiary.utilities.Logger;
+import com.example.mydiary.utilities.SettingsManager;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class HomeActivity extends FragmentActivity implements ActionBar.TabListener, OnMenuItemClickListener, IMyDiaryHttpResponse {
     private final int REQ_CODE_LOGIN = 200;
@@ -54,45 +59,35 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // Initilization
-        myDiaryHttpRequester = new MyDiaryHttpRequester(context, Utils.isOffline(context), this);
+        myDiaryHttpRequester = new MyDiaryHttpRequester(context, SettingsManager.isOffline(context), this);
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mAdapter);
-        checkIfLogged();
+        if(!SettingsManager.isOffline(context)) {
+            checkIfLogged();
+        }
+
+        //TODO: give it to Desi
+        //TODO: try it on dad's phone
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 //
 //        sharedPreferences.edit().remove(Constants.REQUEST_CODES).commit();
 //        sharedPreferences.edit().remove(Constants.NOTES).commit();
 //        sharedPreferences.edit().remove(Constants.DATES).commit();
-        //TODO: remove this if not needed later
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+    }
 
-            @Override
-            public void onPageSelected(int position) {
-                //  actionBar.setSelectedNavigationItem(position);
-            }
-
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
-        });
-
-        //TODO: REFACTOR
-        //TODO: make a pretty UI
-
-        //TODO: add 'help' in the menu and implements it
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myDiaryHttpRequester.setIsOffline(SettingsManager.isOffline(context));
     }
 
     public void checkIfLogged(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String accessToken = sharedPreferences.getString("token", "");
+        String accessToken = sharedPreferences.getString(Constants.TOKEN, Constants.EMPTY_STRING);
 
-        if(accessToken.equals("")){
+        if(accessToken.equals(Constants.EMPTY_STRING)){
             login();
         } else {
             MyDiaryUserModel.setToken(accessToken);
@@ -100,7 +95,6 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
         }
     }
 
-    //TODO: check if these are needed
     @Override
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
         //viewPager.setCurrentItem(tab.getPosition());
@@ -118,15 +112,15 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        if(Utils.isOffline(context)){
+        if(SettingsManager.isOffline(context)){
             menu.findItem(R.id.action_online).setVisible(true);
         } else {
             menu.findItem(R.id.action_logout).setVisible(true);
         }
 
-        setUpPopupMenu(menu);
+        setUpMenu(menu);
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     private boolean onClickMenuOptions(MenuItem item){
@@ -134,15 +128,17 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
             case R.id.action_logout:
                 logout();
                 return true;
+            case R.id.action_settings:
+               onSettingsMenuItemClicked();
+                return true;
             case R.id.action_reminders:
-                Intent intent = new Intent(this, ReminderActivity.class);
-                startActivity(intent);
+                onRemindersMenuItemClicked();
+                return true;
+            case R.id.action_help:
+                onHelpMenuItemClicked();
                 return true;
             case R.id.action_online:
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-                sharedPreferences.edit().putBoolean(Constants.IS_OFFLINE, false).commit();
-                Intent intentLogin = new Intent(this, LoginActivity.class);
-                startActivity(intentLogin);
+                onGoOnlineMenuItemClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -159,29 +155,80 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
         return onClickMenuOptions(item);
     }
 
-    private void setUpPopupMenu(Menu menu){
+    private void setUpMenu(Menu menu){
+        menu.add(0, 0, 1, getString(R.string.action_reminders)).setIcon(R.drawable.alarm).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                onRemindersMenuItemClicked();
+                return true;
+            }
+        }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, 0, 1, getString(R.string.action_settings)).setIcon(R.drawable.settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                onSettingsMenuItemClicked();
+                return true;
+            }
+        }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        menu.add(0, 0, 1, "Help").setIcon(R.drawable.help).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                onHelpMenuItemClicked();
+//                return true;
+//            }
+//        }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        if(SettingsManager.isOffline(context)){
+//            menu.add(0, 0, 1, "GoOnline").setIcon(R.drawable.online).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem menuItem) {
+//                    onGoOnlineMenuItemClicked();
+//                    return true;
+//                }
+//            }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        } else {
+//            menu.add(0, 0, 1, "Logout").setIcon(R.drawable.logout).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem menuItem) {
+//                    logout();
+//                    return true;
+//                }
+//            }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        }
 
-
+        //Logic for adding the name of the user in the right side of the action bar
         this.name = new TextView(this);
-        this.name.setText(MyDiaryUserModel.getName());
+        String title = Constants.MODE_OFFLINE;
+        if(!SettingsManager.isOffline(context)){
+            title = MyDiaryUserModel.getName();
+        }
+
+        this.name.setText(title);
         this.name.setPadding(5, 0, 5, 0);
         this.name.setTextSize(20);
-        this.name.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(HomeActivity.this, v);
-                popupMenu.setOnMenuItemClickListener(HomeActivity.this);
-                popupMenu.inflate(R.menu.main);
-                popupMenu.show();
-
-            }
-        });
-        menu.add(0, 0, 1, "Title").setActionView(this.name).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        //  }
+        menu.add(0, 0, 1, getString(R.string.action_name)).setActionView(this.name).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
+    private void onRemindersMenuItemClicked(){
+        Intent intent = new Intent(this, ReminderActivity.class);
+        startActivity(intent);
+    }
 
+    private void onSettingsMenuItemClicked(){
+        SettingsDialog settingsDialog = new SettingsDialog(context);
+        settingsDialog.show();
+    }
+
+    private void onHelpMenuItemClicked(){
+        Intent intentHelp = new Intent(this, HelpActivity.class);
+        startActivity(intentHelp);
+    }
+
+    private void onGoOnlineMenuItemClicked(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        sharedPreferences.edit().putBoolean(Constants.IS_OFFLINE, false).commit();
+        Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+        startActivityForResult(intent, REQ_CODE_LOGIN);
+    }
 
     private void login() {
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
@@ -190,8 +237,8 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
     private void logout() {
         new AlertDialog.Builder(this)
-                .setTitle("Log Out")
-                .setMessage("Are you sure you want to log out?")
+                .setTitle(Constants.TITLE_LOGOUT)
+                .setMessage(Constants.MESSAGE_LOGOUT)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         myDiaryHttpRequester.logout();
@@ -208,8 +255,8 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
 
     private void noConnectivity() {
         new AlertDialog.Builder(this)
-                .setTitle("No connection to internet or server")
-                .setMessage("Please check your connection. You will be redirected to the login screen")
+                .setTitle(Constants.TITLE_NO_CONNECTION)
+                .setMessage(Constants.MESSAGE_NO_CONNECTION)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         login();
@@ -243,18 +290,22 @@ public class HomeActivity extends FragmentActivity implements ActionBar.TabListe
                         String name = result.getData().replace("\"", "");
                         MyDiaryUserModel.setName(name);
                         invalidateOptionsMenu();
+                        Logger.getInstance().logMessage(TAG, "User had been logged in");
                     } else {
                         login();
+                        Logger.getInstance().logMessage(TAG, "User wasn't logged in");
                     }
                     break;
                 case Logout:
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    sharedPreferences.edit().remove("token").commit();
+                    sharedPreferences.edit().remove(Constants.TOKEN).commit();
+                    Logger.getInstance().logMessage(TAG, "User logged out");
                     break;
                 default:
                     break;
             }
         } else {
+            Logger.getInstance().logMessage(TAG, "The result of the http request was null");
             noConnectivity();
         }
     }

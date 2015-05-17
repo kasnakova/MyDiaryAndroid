@@ -2,35 +2,40 @@
 <resources>
 
     <string name="app_name">My Diary</string>
-    <string name="pref_locale">PrefLocale</string>
+
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_register">Register</string>
+    <string name="title_activity_reminder">My Reminders</string>
+    <string name="title_activity_help">Help</string>
+
     <string name="action_logout">Log out</string>
     <string name="button_save"> Save </string>
     <string name="button_speak"> Speak </string>
     <string name="button_clear"> Clear </string>
-    <string name="speech_prompt">Say something&#8230;</string>
-    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
-    <string name="tap_on_mic">Tap on mic to speak</string>
-    <string name="error_saving_to_db">Sorry but your note was not saved because: </string>
-    <string name="success_saving_to_db">Your note was successfully saved!</string>
-    <string name="error_retrieving_from_db">Sorry but you can\'t see your notes right now</string>
-    <string name="title_activity_login_activty">Login</string>
     <string name="email_text">liza_93@abv.bg</string>
     <string name="password_text">elizaveta</string>
     <string name="name_text">Name</string>
     <string name="login_button_text">Login</string>
     <string name="register_button_text">Register</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_help">Help</string>
     <string name="action_reminders">Reminders</string>
     <string name="action_online">Go online</string>
-    <string name="title_activity_register">RegisterActivity</string>
+    <string name="action_home">Home</string>
     <string name="cant_display_calendar_now">Sorry, but the calendar cannot be displayed right now</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="no_notes_for_day">No notes for this day</string>
-    <string name="title_activity_reminder">My Reminders</string>
     <string name="my_diary_reminder">Reminder</string>
     <string name="cancel">Cancel</string>
     <string name="snooze">Snooze</string>
+    <string name="done">Done</string>
+    <string name="label_snooze_for">Snooze notifications for:</string>
+    <string name="label_minutes">minutes</string>
+    <string name="setting_turn_sound_on">Turn sound on when there is a reminder notification</string>
+    <string name="setting_first_day_of_week">First day of the week in the calendar - Monday\n(otherwise it\'s Sunday)</string>
+    <string name="action_add">Add</string>
+    <string name="action_cancel_all">Cancel all</string>
+    <string name="action_login">Login</string>
+    <string name="action_name">Name</string>
+
 </resources>

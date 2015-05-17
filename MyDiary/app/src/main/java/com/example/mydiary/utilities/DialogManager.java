@@ -39,6 +39,6 @@ public class DialogManager {
     }
 
     public static void NoInternetOrServerAlert(Context context){
-        makeAlert(context, "A problem occurred", "Please check your internet connection or whether the server is running");
+        makeAlert(context, Constants.TITLE_PROBLEM_OCCURRED, Constants.MESSAGE_PROBLEM_OCCURRED);
     }
 }

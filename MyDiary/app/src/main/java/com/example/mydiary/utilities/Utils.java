@@ -1,10 +1,8 @@
 package com.example.mydiary.utilities;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
-import com.example.mydiary.Constants;
+import com.example.mydiary.models.MyDiaryUserModel;
 
 /**
  * Created by Liza on 10.5.2015 г..
@@ -14,8 +12,8 @@ public class Utils {
         return Math.abs(noteText.hashCode());
     }
 
-    public static boolean isOffline(Context context){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        return sharedPreferences.getBoolean(Constants.IS_OFFLINE, false);
+    public static boolean returnToHome(Context context){
+        boolean isLoggedIn = !MyDiaryUserModel.getName().equals(Constants.EMPTY_STRING);
+        return (isLoggedIn || SettingsManager.isOffline(context));
     }
 }

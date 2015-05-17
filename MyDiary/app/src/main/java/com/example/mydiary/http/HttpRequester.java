@@ -9,7 +9,9 @@ import java.net.URL;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.mydiary.fragments.CalendarFragment;
 import com.example.mydiary.interfaces.IAsyncResponse;
+import com.example.mydiary.utilities.Logger;
 
 public class HttpRequester extends AsyncTask<String, Void, String> {
     private final String USER_AGENT = "Mozilla/5.0";
@@ -26,7 +28,6 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         String url = params[0];
         try {
-            Log.d(TAG, "in");
             String requestMethod = params[1];
             URL objUrl = new URL(url);
             connection = (HttpURLConnection) objUrl.openConnection();
@@ -55,9 +56,9 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
                 }
             }
 
-            Log.d(TAG, "Sending");
+            Logger.getInstance().logMessage(TAG, "Sending http request");
             int responseCode = connection.getResponseCode();
-            Log.d(TAG, "Response code " + responseCode);
+            Logger.getInstance().logMessage(TAG, "Response code " + responseCode);
 
             StringBuffer response = new StringBuffer();
             response.append("{'success':");
@@ -84,13 +85,15 @@ public class HttpRequester extends AsyncTask<String, Void, String> {
         } catch (Exception e) {
             try {
                 int responseCode = connection.getResponseCode();
+                Logger.getInstance().logMessage(TAG, "Response code from try block " + responseCode);
                 if(responseCode == 401){
                     return "{'success':'false','url':'" + url + "','data':'" + e.getMessage() + "}";
                 }
             }catch (Exception ex){
-                Log.d(TAG, "Exception in the inner try catch: " + e.toString());
+                Logger.getInstance().logError(TAG, ex);
             }
-            Log.d(TAG, "Exception: " + e.toString());
+
+            Logger.getInstance().logError(TAG, e);
             return null;
         }
     }

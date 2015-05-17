@@ -1,6 +1,8 @@
 package com.example.mydiary.utilities;
 
 import android.util.Log;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +40,12 @@ public class DateManager {
         return fmt.format(calendar.getTime());
     }
 
+    public static String getDateStringWithHyphensFromCalendar(GregorianCalendar calendar){
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+        fmt.setCalendar(calendar);
+        return fmt.format(calendar.getTime());
+    }
+
     public static String getBGDateStringFromCalendar(GregorianCalendar calendar){
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
         fmt.setCalendar(calendar);
@@ -62,7 +70,7 @@ public class DateManager {
             calendar = new GregorianCalendar();
             calendar.setTime(parsedDate);
         } catch(Exception e) {
-            Log.d(TAG, "Date parsing exception: " + e.toString() + " | Message: " + e.getMessage());
+            Logger.getInstance().logError(TAG, e);
         }
 
         return calendar;
@@ -100,9 +108,20 @@ public class DateManager {
             calendar.setTime(parsedDate);
             milis = calendar.getTimeInMillis();
         } catch(Exception e) {
-            Log.d(TAG, "Date parsing exception: " + e.toString() + " | Message: " + e.getMessage());
+            Logger.getInstance().logError(TAG, e);
         }
 
         return milis;
+    }
+
+    public static boolean isDateValid(GregorianCalendar date, DatePicker datePicker, TimePicker timePicker){
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth(), timePicker.getCurrentHour(), timePicker.getCurrentMinute());
+        int compare = calendar.compareTo(date);
+        if(compare < 0){
+            return false;
+        }
+
+        return  true;
     }
 }
